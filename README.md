@@ -10,13 +10,16 @@ This repository contains a minimal app scaffolded from Create Next App and exten
 - Tailwind CSS for styling and `class-variance-authority`, `clsx`, and `tailwind-merge` helpers for class composition
 - TypeScript support
 
-If you just opened the repo, this README will help you start the dev server, understand the layout, and point out the obvious next steps (adding auth backend, env variables, tests, etc.).
+If you just opened the repo, this README helps you start the dev server, configure authentication (NextAuth + Prisma), and run local migrations.
 
 ## Quick start
 
-Prerequisites (assumptions): Node 18+ and pnpm are recommended (this repo includes a `pnpm-lock.yaml`). If you prefer npm or yarn, the scripts are equivalent.
+Prerequisites
 
-Install dependencies and run the dev server (pnpm recommended):
+- Node 18+ (or compatible)
+- pnpm (recommended) — npm/yarn also work
+
+Install dependencies and run the dev server:
 
 ```bash
 # install deps (recommended)
@@ -37,97 +40,125 @@ pnpm lint
 
 Open http://localhost:3000 in your browser.
 
-## What you'll find in this project
+## Project layout
 
-- `app/` – Next.js App Router entrypoints. Example pages include `app/page.tsx`, `app/login/page.tsx`, and `app/signup/page.tsx`.
+- `app/` – Next.js App Router entrypoints (pages, API routes under `app/api/`).
 - `components/` – Reusable UI components and composed forms. Notable files:
-  - `components/login-form.tsx` — login form UI (email/password + Google button placeholder)
-  - `components/signup-form.tsx` — signup form UI (name, email, password, confirm)
-  - `components/ui/` — low-level UI primitives (Button, Card, Field, Input, Label, Separator) used across the app.
-- `lib/utils.ts` — small helper `cn()` that combines `clsx` and `tailwind-merge` for safer className composition.
-- `public/` — static assets (SVGs used in the homepage)
+  - `components/login-form.tsx` — login form UI
+  - `components/signup-form.tsx` — signup form UI
+  - `components/ui/` — low-level UI primitives (Button, Card, Field, Input, Label, Separator)
+- `lib/` – helpers (for example `lib/prisma.ts`)
+- `prisma/` – Prisma schema
+- `public/` — static assets
 
-The styling system uses Tailwind CSS (configured in the repo) and leverages Radix UI primitives for accessibility where appropriate.
+## Authentication (NextAuth + Prisma)
 
-## Key implementation notes
+This template includes scaffolding for NextAuth with a Prisma adapter and an SQLite database for local development.
 
-- TypeScript: the project is typed. Keep components as `React.FC` or typed function components for consistency.
-- Fonts: `app/layout.tsx` uses `next/font/google` to load the Geist fonts and assigns CSS variables for use across the app.
-- Forms: the `LoginForm` and `SignupForm` are purely presentational. They currently submit to no backend — you can wire them to an API route, a third-party auth provider (NextAuth, Supabase, Firebase), or a server action.
+What was provided
 
-## Auth (NextAuth) — recommended setup
+- `prisma/schema.prisma` — data models for `User`, `Account`, `Session`, `VerificationToken`.
+- `lib/prisma.ts` — Prisma client singleton.
+- `app/api/auth/[...nextauth]/route.ts` — NextAuth route configured with Google and Credentials providers and the Prisma adapter.
+- `app/api/auth/signup/route.ts` — a convenience API to create users with hashed passwords.
+- `components/login-form.tsx` and `components/signup-form.tsx` updated to call NextAuth/sign-up flows.
 
-You chose NextAuth. Below are simple steps to integrate NextAuth with this Next.js App Router project.
-
-1. Install packages:
-
-```bash
-pnpm add next-auth @next-auth/prisma-adapter
-# and your chosen provider(s), e.g. for Google:
-pnpm add @next-auth/google-provider
-```
-
-2. Add environment variables (example `.env.local`):
+Environment variables
+Create a `.env.local` file at the project root. Example:
 
 ```env
 # NextAuth
 NEXTAUTH_SECRET=replace_with_a_random_secret
 NEXTAUTH_URL=http://localhost:3000
 
-# Example OAuth provider (Google)
+# OAuth (Google example)
 GOOGLE_CLIENT_ID=your_google_client_id
 GOOGLE_CLIENT_SECRET=your_google_client_secret
+
+# Database (SQLite local dev)
+DATABASE_URL="file:./dev.db"
 ```
 
-3. Create the App Router-compatible auth route: add `app/api/auth/[...nextauth]/route.ts` and export the NextAuth handler (I can scaffold this for you). For example, the file will export a default handler using NextAuth and your chosen providers.
+Security note: use a strong random string for `NEXTAUTH_SECRET` in production.
 
-4. Optionally add a database: NextAuth supports many adapters (Prisma is common). If you add Prisma, set `DATABASE_URL` in `.env.local` and run `prisma migrate`.
+Local setup (first time)
 
-5. Update the `LoginForm`/`SignupForm` to call the NextAuth signIn/signUp flows or use client components that call `signIn('google')`.
+```bash
+# 1. Install deps
+pnpm install
 
-If you want, I can create a working scaffold (route file, provider config, and a small Prisma schema) — tell me whether you'd like the database-backed setup (Prisma + PostgreSQL or SQLite for dev) or a stateless provider-only setup.
+# 2. Generate Prisma client
+npx prisma generate
 
-## Deployment — Vercel
+# 3. Run migrations to create the SQLite database and tables
+npx prisma migrate dev --name init
 
-You chose Vercel. Quick notes to deploy:
+# 4. (Optional) Open Prisma Studio to inspect the DB
+npx prisma studio
 
-- Vercel is the recommended host for Next.js. Connect the repository to Vercel, and it will detect Next.js and set the build command automatically.
-- Ensure environment variables from above are added to your Vercel project settings (NEXTAUTH_SECRET, GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET, DATABASE_URL if used).
-- For production, set `NEXTAUTH_URL` to your Vercel URL (e.g., `https://your-app.vercel.app`).
+# 5. Start the dev server
+pnpm dev
+```
 
-Vercel will run `pnpm install` and `pnpm build` by default (it respects the lockfile). If you run into issues, set the build command to `pnpm build` and the install command to `pnpm install` in the project settings.
+Using the app
 
-## Scripts
+- Go to `/signup` to create a new user (the signup form POSTs to `/api/auth/signup`).
+- After signing up the UI will automatically sign in using the Credentials provider and redirect to `/`.
+- To sign in with Google click the Google button on the signin page — configure OAuth credentials and consent screen in Google Cloud Console and add the client ID/secret to `.env.local`.
+- Default NextAuth sign-in page is available at `/api/auth/signin` if you want to use NextAuth pages.
 
-The following npm scripts are available (see `package.json`):
+Prisma tips
 
-- `dev` — start Next.js in development (uses Turbopack in this template)
-- `build` — build the production app
-- `start` — start the production server after building
-- `lint` — run ESLint
+- If you change your Prisma schema, run `npx prisma migrate dev` to update migrations and your DB.
+- To quickly reset the local DB (dev only):
 
-Run them with `pnpm <script>` (or `npm run <script>` / `yarn <script>`).
+```bash
+npx prisma migrate reset
+# or
+rm prisma/dev.db && npx prisma migrate dev --name init
+```
 
-## How to wire authentication (next steps)
+Upgrade notes & common issues
 
-The repository includes login and signup forms but no backend. Typical options to add authentication:
+- bcrypt native builds: on some platforms installing `bcrypt` can require a native toolchain. If you encounter install/build issues, switch to the pure-JS `bcryptjs` package and update imports.
+- If you change NextAuth versions, consult the NextAuth migration guide — the app router route signature and import paths may differ across major versions.
 
-- NextAuth.js (recommended) — supports OAuth, email, and many providers
-- Supabase or Firebase for a managed auth+DB solution
-- Custom API routes and a database for full control
+Testing the flow locally
 
-If you want, I can scaffold a NextAuth integration now (headless provider-only, or with Prisma/SQLite for dev). Which would you prefer?
+1. Ensure `.env.local` has `DATABASE_URL` and `NEXTAUTH_SECRET`.
+2. Run migrations and start dev server.
+3. Visit `http://localhost:3000/signup` and create an account.
+4. Confirm that a `User` row exists in Prisma Studio and that signing in works.
 
-## Contributing & development tips
+Deployment notes
 
-- Keep UI primitives in `components/ui/` small and reusable.
-- Use the `cn()` helper from `lib/utils.ts` for composing classNames.
-- Add unit or integration tests if you expect to maintain behavior across releases.
+- Add the same environment variables to your host (Vercel, Netlify, etc.).
+- Set `NEXTAUTH_URL` to the production URL (for example `https://your-app.vercel.app`).
+- If using a managed DB in production (Postgres, MySQL), update `DATABASE_URL` accordingly and run migrations against that database.
 
-## Troubleshooting
+Further improvements (optional)
 
-- If the dev server fails to start, ensure you have a compatible Node version (Node 18+ recommended). If you see dependency errors, remove `node_modules` and reinstall with `pnpm install`.
+- Add session type augmentation so `session.user.id` is typed across the app.
+- Add a top-level header that shows `Sign in` / `Sign out` depending on auth state via `useSession`.
+- Add email verification / password reset flows.
+- Add OAuth providers you need (GitHub, Twitter, etc.).
+
+Contributing
+
+- Keep UI primitives small and composable.
+- Add tests for API routes and auth flows if you plan to maintain the template.
+
+Troubleshooting
+
+- If dev server fails to start, check Node version and installed packages. Remove `node_modules` and reinstall (`pnpm install`) if needed.
+- If Prisma client generation fails, make sure `npx prisma generate` runs after `pnpm install`.
 
 ---
 
-I've updated the README with your preferences (pnpm, NextAuth, Vercel). I left a prompt asking whether you'd like a scaffolded NextAuth integration (provider-only or database-backed). Let me know and I'll add it; if you want the scaffold, I'll mark the corresponding todo as in-progress and start creating files.
+If you'd like, I can:
+
+- add a small authenticated header component and protect routes;
+- add session/type augmentation for TypeScript;
+- switch the auth scaffold to a non-database (provider-only) setup.
+
+Tell me which and I will implement it next.
