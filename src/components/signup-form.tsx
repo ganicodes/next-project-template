@@ -1,45 +1,45 @@
-"use client";
+'use client';
 
-import { Button } from "@/components/ui/button";
+import { Button } from '@/components/ui/button';
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "@/components/ui/card";
+} from '@/components/ui/card';
 import {
   Field,
   FieldDescription,
   FieldGroup,
   FieldLabel,
-} from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
-import { cn } from "@/lib/utils";
-import { SignupFormData, signupSchema } from "@/lib/validations";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { signIn } from "next-auth/react";
-import Link from "next/link";
-import { useForm } from "react-hook-form";
+} from '@/components/ui/field';
+import { Input } from '@/components/ui/input';
+import { cn } from '@/lib/utils';
+import { SignupFormData, signupSchema } from '@/lib/validations';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { signIn } from 'next-auth/react';
+import Link from 'next/link';
+import { useForm } from 'react-hook-form';
 
 export function SignupForm({
   className,
   ...props
-}: React.ComponentProps<"div">) {
+}: React.ComponentProps<'div'>) {
   const {
     register,
     handleSubmit,
     formState: { errors },
   } = useForm<SignupFormData>({
     resolver: zodResolver(signupSchema),
-    mode: "onBlur",
+    mode: 'onBlur',
   });
 
   const onSubmit = async (formData: SignupFormData) => {
     try {
-      const response = await fetch("/api/auth/signup", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
+      const response = await fetch('/api/auth/signup', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           name: formData.name,
           email: formData.email,
@@ -49,25 +49,25 @@ export function SignupForm({
 
       if (response.ok) {
         // automatically sign in after signup
-        await signIn("credentials", {
+        await signIn('credentials', {
           email: formData.email,
           password: formData.password,
           redirect: true,
-          callbackUrl: "/",
+          callbackUrl: '/',
         });
       } else {
         // handle error
         const errorData = await response.json();
-        alert(errorData?.error || "Signup failed");
+        alert(errorData?.error || 'Signup failed');
       }
     } catch (error) {
       // alert("An error occurred during signup");
-      console.error("Signup error:", error);
+      console.error('Signup error:', error);
     }
   };
 
   return (
-    <div className={cn("flex flex-col gap-6", className)} {...props}>
+    <div className={cn('flex flex-col gap-6', className)} {...props}>
       <Card>
         <CardHeader className="text-center">
           <CardTitle className="text-xl">Create your account</CardTitle>
@@ -84,8 +84,8 @@ export function SignupForm({
                   id="name"
                   type="text"
                   placeholder="John Doe"
-                  {...register("name")}
-                  className={errors.name ? "border-red-500" : ""}
+                  {...register('name')}
+                  className={errors.name ? 'border-red-500' : ''}
                 />
                 {errors.name && (
                   <FieldDescription className="text-red-500">
@@ -99,8 +99,8 @@ export function SignupForm({
                   id="email"
                   type="email"
                   placeholder="m@example.com"
-                  {...register("email")}
-                  className={errors.email ? "border-red-500" : ""}
+                  {...register('email')}
+                  className={errors.email ? 'border-red-500' : ''}
                 />
                 {errors.email && (
                   <FieldDescription className="text-red-500">
@@ -115,8 +115,8 @@ export function SignupForm({
                     <Input
                       id="password"
                       type="password"
-                      {...register("password")}
-                      className={errors.password ? "border-red-500" : ""}
+                      {...register('password')}
+                      className={errors.password ? 'border-red-500' : ''}
                     />
                     {errors.password && (
                       <FieldDescription className="text-red-500">
@@ -131,8 +131,8 @@ export function SignupForm({
                     <Input
                       id="confirmPassword"
                       type="password"
-                      {...register("confirmPassword")}
-                      className={errors.confirmPassword ? "border-red-500" : ""}
+                      {...register('confirmPassword')}
+                      className={errors.confirmPassword ? 'border-red-500' : ''}
                     />
                     {errors.confirmPassword && (
                       <FieldDescription className="text-red-500">
@@ -157,7 +157,7 @@ export function SignupForm({
         </CardContent>
       </Card>
       <FieldDescription className="px-6 text-center">
-        By clicking continue, you agree to our <a href="#">Terms of Service</a>{" "}
+        By clicking continue, you agree to our <a href="#">Terms of Service</a>{' '}
         and <a href="#">Privacy Policy</a>.
       </FieldDescription>
     </div>
