@@ -14,28 +14,60 @@ If you just opened the repo, this README helps you start the dev server, configu
 
 ## Quick start
 
-Prerequisites
+## Prerequisites
 
-- Node 18+ (or compatible)
+- Node.js 18+ (or compatible)
 - pnpm (recommended) — npm/yarn also work
+- Git for version control
 
-Install dependencies and run the dev server:
+## Tech Stack
+
+- **Framework**: Next.js 15.5 with App Router
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS with class composition utilities
+- **Authentication**: NextAuth.js with Prisma adapter
+- **Database**: Prisma ORM (default: SQLite for development)
+- **UI Components**: Custom components with Radix UI primitives
+- **Form Handling**: React Hook Form with Zod validation
+- **Testing**: Jest and React Testing Library
+- **Development Tools**:
+  - ESLint for code linting
+  - Prettier for code formatting
+  - TurboPack for faster builds
+  - TypeScript for type safety
+
+## Available Scripts
 
 ```bash
-# install deps (recommended)
+# Install dependencies (recommended)
 pnpm install
 
-# start dev server
+# Start development server with Turbopack
 pnpm dev
 
-# build for production
+# Build for production with Turbopack
 pnpm build
 
-# run production server (after build)
+# Start production server (after build)
 pnpm start
 
-# run linter
+# Run ESLint for code linting
 pnpm lint
+
+# Fix ESLint issues automatically
+pnpm lint:fix
+
+# Check code formatting with Prettier
+pnpm format
+
+# Fix code formatting issues automatically
+pnpm format:fix
+
+# Run tests with Jest and update snapshots
+pnpm test
+
+# Run tests in watch mode for development
+pnpm test:watch
 ```
 
 Open http://localhost:3000 in your browser.
@@ -143,12 +175,37 @@ Further improvements (optional)
 - Add email verification / password reset flows.
 - Add OAuth providers you need (GitHub, Twitter, etc.).
 
-Contributing
+## Development Workflow
 
-- Keep UI primitives small and composable.
-- Add tests for API routes and auth flows if you plan to maintain the template.
+### Code Quality Tools
 
-Troubleshooting
+- **ESLint**: Run `pnpm lint` to check for code issues, or `pnpm lint:fix` to automatically fix issues.
+- **Prettier**: Run `pnpm format` to check formatting, or `pnpm format:fix` to automatically fix formatting.
+- **TypeScript**: Type checking happens during development and build.
+
+### Testing
+
+The project uses Jest and React Testing Library for testing. Test files are located in the `__test__` directory.
+
+- Run `pnpm test` to run all tests and update snapshots
+- Run `pnpm test:watch` for interactive testing during development
+- Test coverage reports are generated in the `coverage` directory
+
+### Building for Production
+
+1. Run `pnpm build` to create an optimized production build
+2. Run `pnpm start` to start the production server
+3. Visit `http://localhost:3000` to view your application
+
+## Contributing
+
+- Keep UI primitives small and composable
+- Write tests for new features and API routes
+- Follow the established code style (enforced by ESLint and Prettier)
+- Create meaningful commit messages
+- Update documentation when making significant changes
+
+## Troubleshooting
 
 - If dev server fails to start, check Node version and installed packages. Remove `node_modules` and reinstall (`pnpm install`) if needed.
 - If Prisma client generation fails, make sure `npx prisma generate` runs after `pnpm install`.
