@@ -1,26 +1,26 @@
-'use client';
+"use client";
 
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Field,
   FieldDescription,
   FieldGroup,
   FieldLabel,
   FieldSeparator,
-} from '@/components/ui/field';
-import { Input } from '@/components/ui/input';
-import { cn } from '@/lib/utils';
-import { LoginFormData, loginSchema } from '@/lib/validations';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { signIn } from 'next-auth/react';
-import Link from 'next/link';
-import { useForm } from 'react-hook-form';
+} from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
+import { cn } from "@/lib/utils";
+import { LoginFormData, loginSchema } from "@/lib/validations";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { signIn } from "next-auth/react";
+import Link from "next/link";
+import { useForm } from "react-hook-form";
 
 export function LoginForm({
   className,
   ...props
-}: React.ComponentProps<'div'>) {
+}: React.ComponentProps<"div">) {
   const {
     register,
     handleSubmit,
@@ -30,16 +30,16 @@ export function LoginForm({
   });
 
   const onSubmit = async (data: LoginFormData) => {
-    await signIn('credentials', {
+    await signIn("credentials", {
       email: data.email,
       password: data.password,
       redirect: true,
-      callbackUrl: '/',
+      callbackUrl: "/",
     });
   };
 
   return (
-    <div className={cn('flex flex-col gap-6', className)} {...props}>
+    <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card>
         <CardHeader className="text-center">
           <CardTitle className="text-xl">Welcome back</CardTitle>
@@ -54,8 +54,8 @@ export function LoginForm({
                   id="email"
                   type="email"
                   placeholder="m@example.com"
-                  {...register('email')}
-                  className={errors.email ? 'border-red-500' : ''}
+                  {...register("email")}
+                  className={errors.email ? "border-red-500" : ""}
                 />
                 {errors.email && (
                   <FieldDescription className="text-red-500">
@@ -76,8 +76,8 @@ export function LoginForm({
                 <Input
                   id="password"
                   type="password"
-                  {...register('password')}
-                  className={errors.password ? 'border-red-500' : ''}
+                  {...register("password")}
+                  className={errors.password ? "border-red-500" : ""}
                 />
                 {errors.password && (
                   <FieldDescription className="text-red-500">
@@ -88,8 +88,8 @@ export function LoginForm({
               <Field>
                 <Button type="submit">Login</Button>
                 <FieldDescription className="text-center">
-                  Don&apos;t have an account?{' '}
-                  <Link href={'/signup'}>Sign up</Link>
+                  Don&apos;t have an account?{" "}
+                  <Link href={"/signup"}>Sign up</Link>
                 </FieldDescription>
               </Field>
               <FieldSeparator className="*:data-[slot=field-separator-content]:bg-card">
@@ -99,7 +99,7 @@ export function LoginForm({
                 <Button
                   variant="outline"
                   type="button"
-                  onClick={() => signIn('google')}
+                  onClick={() => signIn("google")}
                 >
                   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
                     <path
@@ -115,7 +115,7 @@ export function LoginForm({
         </CardContent>
       </Card>
       <FieldDescription className="px-6 text-center">
-        By clicking continue, you agree to our <a href="#">Terms of Service</a>{' '}
+        By clicking continue, you agree to our <a href="#">Terms of Service</a>{" "}
         and <a href="#">Privacy Policy</a>.
       </FieldDescription>
     </div>
