@@ -158,9 +158,10 @@ Upgrade notes & common issues
 Testing the flow locally
 
 1. Ensure `.env.local` has `DATABASE_URL` and `NEXTAUTH_SECRET`.
-2. Run migrations and start dev server.
-3. Visit `http://localhost:3000/signup` and create an account.
-4. Confirm that a `User` row exists in Prisma Studio and that signing in works.
+2. Docker command to run a Postgres container for local development `docker run --name dbName -e POSTGRES_USER=username -e POSTGRES_PASSWORD=password -e POSTGRES_DB=db -p 5432:5432 -d postgres`
+3. Run migrations and start dev server.
+4. Visit `http://localhost:3000/signup` and create an account.
+5. Confirm that a `User` row exists in Prisma Studio and that signing in works.
 
 Deployment notes
 
@@ -209,13 +210,3 @@ The project uses Jest and React Testing Library for testing. Test files are loca
 
 - If dev server fails to start, check Node version and installed packages. Remove `node_modules` and reinstall (`pnpm install`) if needed.
 - If Prisma client generation fails, make sure `npx prisma generate` runs after `pnpm install`.
-
----
-
-If you'd like, I can:
-
-- add a small authenticated header component and protect routes;
-- add session/type augmentation for TypeScript;
-- switch the auth scaffold to a non-database (provider-only) setup.
-
-Tell me which and I will implement it next.
